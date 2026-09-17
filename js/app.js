@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const WHATSAPP_BASE = `https://wa.me/91${SALES_PHONE}`;
   // Paste Google Apps Script Web App URL after deploying integrations/google-apps-script/Code.gs
   // Example: 'https://script.google.com/macros/s/AKfycbx.../exec'
-  const LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbz_kgCLozDsAcUOKLlD-gvYsHn8z39E0kpY23Oy8h2nWv-9AM9hkZiUkwkK9gkwBcXw/exec';
+  const LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzwq4mSxHld2BBv640Mp4FhARkwBFkI_4OniQd9ynxYgRiBcnTAl44qaHUDF4gWG12d/exec';
 
   // --- Sticky Header on Scroll ---
   const header = document.querySelector('.site-header');
