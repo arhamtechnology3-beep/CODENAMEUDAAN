@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://codenameudaan.in/</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://codenameudaan.in/assets/images/og-cover.jpg</image:loc>
+      <image:title>Codename Udaan Open Graph Cover</image:title>
+      <image:caption>Premium 1 and 2 BHK residences in Shahad West, Kalyan — Codename Udaan</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://codenameudaan.in/assets/images/tower-elevation-day.jpg</image:loc>
+      <image:title>Codename Udaan Day Elevation</image:title>
+      <image:caption>Luxury high-rise residential tower at Codename Udaan, Shahad West, Kalyan</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://codenameudaan.in/assets/images/campus-aerial-view.jpg</image:loc>
+      <image:title>Codename Udaan Campus Aerial View</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://codenameudaan.in/#overview</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://codenameudaan.in/#configurations</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://codenameudaan.in/#floor-plans</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://codenameudaan.in/#amenities</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://codenameudaan.in/#location</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://codenameudaan.in/#faqs</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://codenameudaan.in/#site-visit</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+</urlset>

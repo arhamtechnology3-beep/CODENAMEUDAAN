@@ -1,0 +1,39 @@
+# Codename Udaan — crawl directives
+User-agent: *
+Allow: /
+Disallow: /assets/images/*.psd
+Disallow: /*.pdf$
+
+# Generative / answer engines
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+Sitemap: https://codenameudaan.in/sitemap.xml
+Host: https://codenameudaan.in
