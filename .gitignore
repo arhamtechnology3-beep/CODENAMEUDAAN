@@ -1,0 +1,14 @@
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Large source/marketing files (not used by the live site)
+*.pdf
+CAM *.jpg
+CAM*.jpg
+Block-*.png
+*_VardhmanProject_Sahad.png
+WhatsApp Image*
+LOGO.png
+Vardhaman Park-1.pdf
