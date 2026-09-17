@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const SALES_PHONE = '9619124440';
   const SALES_EMAIL = 'udaancodname@gmail.com';
   const WHATSAPP_BASE = `https://wa.me/91${SALES_PHONE}`;
+  // Paste Google Apps Script Web App URL after deploying integrations/google-apps-script/Code.gs
+  // Example: 'https://script.google.com/macros/s/AKfycbx.../exec'
+  const LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbz_kgCLozDsAcUOKLlD-gvYsHn8z39E0kpY23Oy8h2nWv-9AM9hkZiUkwkK9gkwBcXw/exec';
 
   // --- Sticky Header on Scroll ---
   const header = document.querySelector('.site-header');
@@ -621,7 +624,55 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  function handleLeadSubmission(e, formType) {
+  async function submitLeadToBackend(leadRecord) {
+    if (!LEAD_WEBHOOK_URL) {
+      throw new Error('Lead webhook is not configured. Add LEAD_WEBHOOK_URL in js/app.js.');
+    }
+
+    const payload = {
+      ...leadRecord,
+      source: window.location.href,
+      page: window.location.pathname || '/',
+      userAgent: navigator.userAgent
+    };
+
+    // text/plain avoids CORS preflight; Apps Script still parses JSON body
+    const response = await fetch(LEAD_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'cors',
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    // Apps Script may return opaque/redirected responses; treat HTTP 200 family as success
+    if (!response.ok && response.type !== 'opaque') {
+      throw new Error(`Lead webhook failed (${response.status}).`);
+    }
+
+    // Best-effort JSON parse when readable
+    try {
+      const text = await response.text();
+      if (text) {
+        const data = JSON.parse(text);
+        if (data && data.ok === false) {
+          throw new Error(data.message || 'Lead webhook rejected the submission.');
+        }
+      }
+    } catch (parseErr) {
+      if (parseErr instanceof SyntaxError) {
+        // Non-JSON success body is fine for Apps Script redirects
+        return true;
+      }
+      throw parseErr;
+    }
+
+    return true;
+  }
+
+  async function handleLeadSubmission(e, formType) {
     e.preventDefault();
     const form = e.target;
     clearFormErrors(form);
@@ -633,6 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const config = form.querySelector('[name="configuration"]')?.value || '1 or 2 BHK';
     const visitDate = form.querySelector('[name="visit_date"]')?.value || '';
     const visitTime = form.querySelector('[name="visit_time"]')?.value || '';
+    const submitBtn = form.querySelector('[type="submit"]');
 
     let hasError = false;
     let firstInvalid = null;
@@ -687,13 +739,40 @@ document.addEventListener('DOMContentLoaded', () => {
       timestamp: new Date().toISOString()
     };
 
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.innerHTML = '<span>Sending...</span>';
+    }
+
+    let delivered = false;
+    try {
+      await submitLeadToBackend(leadRecord);
+      delivered = true;
+    } catch (err) {
+      console.error('Lead delivery failed:', err);
+      // Keep local backup + WhatsApp fallback so the enquiry is never lost
+      delivered = false;
+    }
+
     saveLead(leadRecord);
     closeLeadModal();
     form.reset();
     clearFormErrors(form);
     unlockFloorPlans(false);
 
-    showToast(`Thank you, ${name}! Floor plans unlocked. Our advisor will call you on +91 ${cleanPhone}.`);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
+      submitBtn.innerHTML = originalBtnHtml;
+    }
+
+    if (delivered) {
+      showToast(`Thank you, ${name}! Details sent to our sales desk. Floor plans unlocked.`);
+    } else {
+      showToast(`Thank you, ${name}! Floor plans unlocked. Please continue on WhatsApp so our advisor gets your details.`);
+    }
 
     const waText = encodeURIComponent(
       `Hello! I just submitted an inquiry for Codename Udaan (Shahad West, Kalyan).\nName: ${name}\nPhone: +91 ${cleanPhone}\nEmail: ${email}\nInterested In: ${config}\nPurpose: ${formType}`
@@ -701,7 +780,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const waUrl = `${WHATSAPP_BASE}?text=${waText}`;
 
     setTimeout(() => {
-      const confirmWa = confirm('Would you like to connect directly on WhatsApp with our sales desk for instant pricing & PDF brochure?');
+      const confirmWa = confirm(
+        delivered
+          ? 'Would you like to also connect on WhatsApp for instant pricing & brochure?'
+          : 'Lead email/sheet sync is pending. Connect on WhatsApp now so our sales desk receives your enquiry instantly?'
+      );
       if (confirmWa) {
         window.open(waUrl, '_blank');
       }
