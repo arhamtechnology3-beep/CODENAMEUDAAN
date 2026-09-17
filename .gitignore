@@ -5,10 +5,13 @@
 
 # Large source/marketing files (not used by the live site)
 *.pdf
-CAM *.jpg
-CAM*.jpg
+/CAM *.jpg
+/CAM[0-9]*.jpg
 Block-*.png
 *_VardhmanProject_Sahad.png
 WhatsApp Image*
-LOGO.png
+/LOGO.png
 Vardhaman Park-1.pdf
+
+# Keep site assets trackable even if names overlap marketing patterns
+!assets/images/campus-aerial-view.jpg
