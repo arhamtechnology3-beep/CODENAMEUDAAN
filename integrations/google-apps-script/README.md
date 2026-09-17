@@ -1,45 +1,30 @@
-# Codename Udaan — Lead Email + Google Sheet Setup
+# Fix the WhatsApp “sync pending” popup
 
-Leads from the website forms are sent to **udaancodname@gmail.com** and appended to a Google Sheet through a Google Apps Script web app.
+That popup appears when Google Apps Script fails.
 
-## 1) Create the sheet
+## Confirmed error on your current webhook
 
-1. Open [Google Sheets](https://sheets.google.com) while logged into the Gmail that should own the sheet (ideally `udaancodname@gmail.com`).
-2. Create a spreadsheet named **Codename Udaan Leads**.
-3. Keep the first tab (it can be blank). The script creates a **Leads** tab automatically.
-
-## 2) Install the script
-
-1. In the sheet: **Extensions → Apps Script**.
-2. Delete any default code.
-3. Paste everything from `Code.gs` in this folder.
-4. Click **Save**.
-
-## 3) Deploy as web app
-
-1. Click **Deploy → New deployment**.
-2. Type: **Web app**.
-3. Description: `Codename Udaan leads`.
-4. Execute as: **Me**.
-5. Who has access: **Anyone**.
-6. Click **Deploy**, authorize permissions, then **copy the Web App URL**.
-
-## 4) Connect the website
-
-1. Open `js/app.js`.
-2. Paste the Web App URL into:
-
-```js
-const LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/XXXX/exec';
+```text
+ReferenceError: document is not defined (line 6, file "Code")
 ```
 
-3. Push / redeploy the site (Hostinger + GitHub).
+That means the Apps Script project still has **browser/website code** (or broken code).  
+Apps Script is server-side — there is **no** `document`.
 
-## 5) Test
+## Fix (required)
 
-1. Submit any enquiry form on https://codenameudaan.in/
-2. Confirm:
-   - New row in the **Leads** sheet
-   - Email arrives at **udaancodname@gmail.com**
+1. Open your **Codename Udaan Leads** Google Sheet  
+2. **Extensions → Apps Script**
+3. Delete **all** existing code
+4. Paste **only** the contents of `Code.gs` from this folder
+5. Save
+6. **Deploy → New deployment → Web app**
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+7. Authorize
+8. Copy the new URL ending in `/exec`
+9. Send that URL so we can update `LEAD_WEBHOOK_URL` in `js/app.js` (or paste it yourself)
 
-If email is missing, check Spam and re-authorize the Apps Script deployment.
+## Quick test in Apps Script
+
+After pasting `Code.gs`, you can also run `doGet` from the editor — it should return JSON like `{"ok":true,...}` with no errors.

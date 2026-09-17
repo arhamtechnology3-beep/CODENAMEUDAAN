@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const WHATSAPP_BASE = `https://wa.me/91${SALES_PHONE}`;
   // Paste Google Apps Script Web App URL after deploying integrations/google-apps-script/Code.gs
   // Example: 'https://script.google.com/macros/s/AKfycbx.../exec'
-  const LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzwq4mSxHld2BBv640Mp4FhARkwBFkI_4OniQd9ynxYgRiBcnTAl44qaHUDF4gWG12d/exec';
+  const LEAD_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyxOiUK-BqEaLcu3v57_iPK55Utmb5l1J0nVY2WWV6pQBB62_ajB-wZHCI1fq4jr_PC/exec';
 
   // --- Sticky Header on Scroll ---
   const header = document.querySelector('.site-header');
@@ -635,41 +635,55 @@ document.addEventListener('DOMContentLoaded', () => {
       page: window.location.pathname || '/',
       userAgent: navigator.userAgent
     };
+    const body = JSON.stringify(payload);
 
-    // text/plain avoids CORS preflight; Apps Script still parses JSON body
-    const response = await fetch(LEAD_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'cors',
-      redirect: 'follow',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    // Apps Script may return opaque/redirected responses; treat HTTP 200 family as success
-    if (!response.ok && response.type !== 'opaque') {
-      throw new Error(`Lead webhook failed (${response.status}).`);
-    }
-
-    // Best-effort JSON parse when readable
+    // Prefer CORS so we can detect Apps Script errors (e.g. broken deploy).
+    // Fall back to no-cors fire-and-forget if the browser blocks reading the response.
     try {
+      const response = await fetch(LEAD_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body
+      });
+
       const text = await response.text();
       if (text) {
-        const data = JSON.parse(text);
-        if (data && data.ok === false) {
-          throw new Error(data.message || 'Lead webhook rejected the submission.');
+        if (text.indexOf('ReferenceError') !== -1 || text.indexOf('document is not defined') !== -1) {
+          throw new Error('Apps Script Code.gs is invalid. Paste integrations/google-apps-script/Code.gs and redeploy as Web app (Anyone).');
+        }
+        if (text.trim().charAt(0) === '{') {
+          const data = JSON.parse(text);
+          if (data && data.ok === false) {
+            throw new Error(data.message || 'Lead webhook rejected the submission.');
+          }
+          if (data && data.ok === true) {
+            return true;
+          }
+        }
+        if (/<!DOCTYPE|<html/i.test(text) && !/\"ok\"\s*:/.test(text)) {
+          throw new Error('Apps Script returned an HTML error page. Redeploy Web app with access: Anyone.');
         }
       }
-    } catch (parseErr) {
-      if (parseErr instanceof SyntaxError) {
-        // Non-JSON success body is fine for Apps Script redirects
-        return true;
-      }
-      throw parseErr;
-    }
 
-    return true;
+      if (!response.ok) {
+        throw new Error(`Lead webhook failed (${response.status}).`);
+      }
+      return true;
+    } catch (corsErr) {
+      // Network/CORS fallback — request still often reaches Apps Script
+      if (corsErr && /Apps Script|Lead webhook|rejected/i.test(String(corsErr.message || corsErr))) {
+        throw corsErr;
+      }
+      await fetch(LEAD_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body
+      });
+      return true;
+    }
   }
 
   async function handleLeadSubmission(e, formType) {

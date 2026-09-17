@@ -1,131 +1,83 @@
 /**
- * Codename Udaan — Lead Capture (Email + Google Sheet)
+ * Codename Udaan — Lead Capture
+ * Emails udaancodname@gmail.com + appends a Google Sheet row.
  *
- * SETUP (one-time):
- * 1. Create a Google Sheet named "Codename Udaan Leads".
- * 2. Extensions → Apps Script → paste this entire file → Save.
- * 3. Set NOTIFY_EMAIL below (already set to udaancodname@gmail.com).
- * 4. Deploy → New deployment → Type: Web app
- *      - Execute as: Me
- *      - Who has access: Anyone
- * 5. Copy the Web App URL.
- * 6. Paste that URL into js/app.js as LEAD_WEBHOOK_URL.
- * 7. Submit a test lead from the website.
+ * IMPORTANT: Paste ONLY this file into Apps Script (Extensions → Apps Script).
+ * Do not paste website HTML/JS. Apps Script has no browser `document` object.
  *
- * Sheet columns (auto-created on first lead):
- * Timestamp | Name | Phone | Email | Configuration | Form Type | Visit Date | Visit Time | Source Page
+ * Deploy: Deploy → New deployment → Web app
+ *   Execute as: Me
+ *   Who has access: Anyone
+ * Then copy the /exec URL into js/app.js → LEAD_WEBHOOK_URL
  */
 
 var NOTIFY_EMAIL = 'udaancodname@gmail.com';
 var SHEET_NAME = 'Leads';
 
-function doGet() {
-  return ContentService
-    .createTextOutput(JSON.stringify({
-      ok: true,
-      service: 'Codename Udaan Lead Capture',
-      email: NOTIFY_EMAIL
-    }))
-    .setMimeType(ContentService.MimeType.JSON);
+function doGet(e) {
+  return respond_({ ok: true, service: 'Codename Udaan Lead Capture' });
 }
 
 function doPost(e) {
   try {
-    var payload = parsePayload_(e);
-    var lead = normalizeLead_(payload);
-
-    appendLeadRow_(lead);
-    sendLeadEmail_(lead);
-
-    return json_({ ok: true, message: 'Lead saved and email sent.' });
+    var lead = normalizeLead_(parseBody_(e));
+    writeLead_(lead);
+    mailLead_(lead);
+    return respond_({ ok: true, message: 'Lead saved and email sent' });
   } catch (err) {
-    return json_({ ok: false, message: String(err && err.message ? err.message : err) });
+    return respond_({ ok: false, message: String(err && err.message ? err.message : err) });
   }
 }
 
-function parsePayload_(e) {
+function parseBody_(e) {
   if (!e || !e.postData || !e.postData.contents) {
-    throw new Error('Empty request body.');
+    throw new Error('Empty request body');
   }
-
-  var raw = e.postData.contents;
-  var type = String(e.postData.type || '').toLowerCase();
-
-  if (type.indexOf('application/json') !== -1 || raw.trim().charAt(0) === '{') {
+  var raw = String(e.postData.contents);
+  if (raw.charAt(0) === '{') {
     return JSON.parse(raw);
   }
-
-  // application/x-www-form-urlencoded fallback
   var out = {};
-  var parts = raw.split('&');
-  for (var i = 0; i < parts.length; i++) {
-    var pair = parts[i].split('=');
-    var key = decodeURIComponent((pair[0] || '').replace(/\+/g, ' '));
-    var val = decodeURIComponent((pair.slice(1).join('=') || '').replace(/\+/g, ' '));
-    out[key] = val;
+  var pairs = raw.split('&');
+  for (var i = 0; i < pairs.length; i++) {
+    var p = pairs[i].split('=');
+    var k = decodeURIComponent((p[0] || '').replace(/\+/g, ' '));
+    var v = decodeURIComponent((p.slice(1).join('=') || '').replace(/\+/g, ' '));
+    if (k) out[k] = v;
   }
   return out;
 }
 
 function normalizeLead_(data) {
+  data = data || {};
   var name = String(data.name || '').trim();
   var phone = String(data.phone || data.phoneE164 || '').trim();
   var email = String(data.email || '').trim();
-  var config = String(data.config || data.configuration || '').trim();
-  var formType = String(data.formType || data.type || 'Website Lead').trim();
-  var visitDate = String(data.visitDate || data.visit_date || '').trim();
-  var visitTime = String(data.visitTime || data.visit_time || '').trim();
-  var source = String(data.source || data.page || 'https://codenameudaan.in/').trim();
-  var timestamp = String(data.timestamp || new Date().toISOString()).trim();
-
-  if (!name) throw new Error('Name is required.');
-  if (!phone) throw new Error('Phone is required.');
-
+  if (!name) throw new Error('Name is required');
+  if (!phone) throw new Error('Phone is required');
   return {
-    timestamp: timestamp,
+    timestamp: String(data.timestamp || new Date().toISOString()),
     name: name,
     phone: phone,
     email: email || '—',
-    config: config || '—',
-    formType: formType,
-    visitDate: visitDate || '—',
-    visitTime: visitTime || '—',
-    source: source
+    config: String(data.config || data.configuration || '—').trim() || '—',
+    formType: String(data.formType || data.type || 'Website Lead').trim() || 'Website Lead',
+    visitDate: String(data.visitDate || data.visit_date || '—').trim() || '—',
+    visitTime: String(data.visitTime || data.visit_time || '—').trim() || '—',
+    source: String(data.source || data.page || 'https://codenameudaan.in/').trim()
   };
 }
 
-function getLeadsSheet_() {
+function writeLead_(lead) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) {
-    throw new Error('Open this script from the Google Sheet (Extensions → Apps Script).');
-  }
-
+  if (!ss) throw new Error('Bind this script to your Google Sheet (open via Extensions → Apps Script)');
   var sheet = ss.getSheetByName(SHEET_NAME);
-  if (!sheet) {
-    sheet = ss.insertSheet(SHEET_NAME);
-  }
-
+  if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow([
-      'Timestamp',
-      'Name',
-      'Phone',
-      'Email',
-      'Configuration',
-      'Form Type',
-      'Visit Date',
-      'Visit Time',
-      'Source Page'
-    ]);
-    sheet.getRange(1, 1, 1, 9).setFontWeight('bold');
+    sheet.appendRow(['Timestamp', 'Name', 'Phone', 'Email', 'Configuration', 'Form Type', 'Visit Date', 'Visit Time', 'Source Page']);
     sheet.setFrozenRows(1);
   }
-
-  return sheet;
-}
-
-function appendLeadRow_(lead) {
-  getLeadsSheet_().appendRow([
+  sheet.appendRow([
     lead.timestamp,
     lead.name,
     lead.phone,
@@ -138,63 +90,29 @@ function appendLeadRow_(lead) {
   ]);
 }
 
-function sendLeadEmail_(lead) {
-  var subject = 'New Codename Udaan Lead — ' + lead.name + ' (' + lead.formType + ')';
-  var body = [
-    'New lead received from Codename Udaan website.',
-    '',
-    'Name: ' + lead.name,
-    'Phone: ' + lead.phone,
-    'Email: ' + lead.email,
-    'Configuration: ' + lead.config,
-    'Form / Purpose: ' + lead.formType,
-    'Preferred Visit Date: ' + lead.visitDate,
-    'Preferred Visit Time: ' + lead.visitTime,
-    'Submitted At: ' + lead.timestamp,
-    'Source: ' + lead.source,
-    '',
-    '— Auto notification from Codename Udaan lead form'
-  ].join('\n');
-
+function mailLead_(lead) {
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,
-    subject: subject,
-    body: body,
+    subject: 'New Codename Udaan Lead — ' + lead.name + ' (' + lead.formType + ')',
+    body: [
+      'New lead from Codename Udaan website',
+      '',
+      'Name: ' + lead.name,
+      'Phone: ' + lead.phone,
+      'Email: ' + lead.email,
+      'Configuration: ' + lead.config,
+      'Form / Purpose: ' + lead.formType,
+      'Visit Date: ' + lead.visitDate,
+      'Visit Time: ' + lead.visitTime,
+      'Submitted At: ' + lead.timestamp,
+      'Source: ' + lead.source
+    ].join('\n'),
     replyTo: (lead.email && lead.email !== '—') ? lead.email : NOTIFY_EMAIL
   });
 }
 
-function json_(obj) {
+function respond_(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
-}
-
-/**
- * Optional manual test from the Apps Script editor:
- * Run testLead_() once after deploy to verify Sheet + email.
- */
-function testLead_() {
-  appendLeadRow_({
-    timestamp: new Date().toISOString(),
-    name: 'Test Lead',
-    phone: '+919619124440',
-    email: 'test@example.com',
-    config: '2 BHK Luxury',
-    formType: 'Manual Script Test',
-    visitDate: '—',
-    visitTime: '—',
-    source: 'Apps Script Editor'
-  });
-  sendLeadEmail_({
-    timestamp: new Date().toISOString(),
-    name: 'Test Lead',
-    phone: '+919619124440',
-    email: 'test@example.com',
-    config: '2 BHK Luxury',
-    formType: 'Manual Script Test',
-    visitDate: '—',
-    visitTime: '—',
-    source: 'Apps Script Editor'
-  });
 }
