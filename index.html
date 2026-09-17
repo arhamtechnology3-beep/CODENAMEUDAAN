@@ -155,94 +155,122 @@
          Hero Section
          ========================================================================== -->
     <section class="hero-section" id="hero" aria-label="Hero Introduction">
-      <div class="hero-split">
-        <div class="hero-copy">
-          <div class="hero-content">
-            <div class="hero-tagline-wrap">
-              <span class="hero-tagline-text">Step Closer To Your New Beginning</span>
+      <div class="hero-slider-container" id="heroSlider" aria-label="Project Visual Showcase">
+        <div class="hero-slide active" data-index="0" data-label="Day Elevation">
+          <img src="assets/images/tower-elevation-day.jpg" alt="Codename Udaan Iconic 20+ Storey Tower - Day View" class="hero-slide-img" fetchpriority="high" />
+        </div>
+        <div class="hero-slide" data-index="1" data-label="Twilight Architecture">
+          <img src="assets/images/tower-elevation-eve.jpg" alt="Codename Udaan Architectural Landmark - Evening Illumination" class="hero-slide-img" loading="lazy" />
+        </div>
+        <div class="hero-slide" data-index="2" data-label="Master Campus View">
+          <img src="assets/images/campus-aerial-view.jpg" alt="Codename Udaan Landscaped Campus &amp; Amenities Aerial View" class="hero-slide-img" loading="lazy" />
+        </div>
+        <div class="hero-slider-overlay"></div>
+      </div>
+
+      <button type="button" class="hero-nav-btn hero-nav-prev" id="heroSidePrevBtn" aria-label="Previous slide">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button type="button" class="hero-nav-btn hero-nav-next" id="heroSideNextBtn" aria-label="Next slide">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <div class="hero-center">
+        <div class="hero-brand-row">
+          <img src="assets/images/logo-udaan.png" alt="Codename Udaan" class="hero-brand-logo" />
+          <div class="hero-rera-badge">
+            <span>MahaRERA Registered</span>
+            <strong>P51700006298</strong>
+          </div>
+        </div>
+
+        <h1 class="hero-title">Codename Udaan</h1>
+        <p class="hero-script">Step Closer To Your New Beginning</p>
+
+        <p class="hero-desc">
+          An iconic high-rise landmark on Shahad-Mohane Road offering premium
+          <strong>1 &amp; 2 BHK Residences</strong> with sundeck patios,
+          <strong>15+ lifestyle amenities</strong>, and connectivity just
+          <strong>2 minutes from Shahad Station</strong>.
+        </p>
+
+        <div class="hero-feature-grid">
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon" aria-hidden="true">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
             </div>
-
-            <h1 class="hero-h1">
-              Luxury <span class="text-gold-gradient">1 &amp; 2 BHK</span> Residences at Shahad (W), Kalyan
-            </h1>
-
-            <p class="hero-desc">
-              Experience elevated living in an iconic 20+ storey architectural landmark. Designed with spacious sundeck patios, 15+ world-class amenities, and supreme connectivity just 2 minutes from Shahad Railway Station.
-            </p>
-
-            <div class="hero-badges-row">
-              <div class="hero-feature-pill">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h14v-8h3L12 3zm0 4.5l6 5.4V18H6v-5.1l6-5.4z"/></svg>
-                <span>Iconic 20+ Storey Tower</span>
-              </div>
-              <div class="hero-feature-pill">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                <span>2 Mins to Shahad Station</span>
-              </div>
-              <div class="hero-feature-pill">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                <span>MahaRERA: P51700006298</span>
-              </div>
+            <div>
+              <h3>2 Mins to Station</h3>
+              <p>Shahad Railway Station</p>
             </div>
-
-            <div class="hero-cta-group">
-              <button type="button" class="btn btn-gold btn-lg btn-pulse" data-action="open-modal" data-title="Request Pre-Launch Price Sheet" data-sub="Unlock all-inclusive pricing, floor-wise cost breakups &amp; payment plans." data-type="Cost Sheet Request" data-btn="Unlock Price Breakdown">
-                <span>Unlock Pre-Launch Pricing</span>
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
-              <a href="#site-visit" class="btn btn-outline-gold btn-lg">
-                <span>Book VIP Site Visit</span>
-              </a>
+          </div>
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon" aria-hidden="true">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+            </div>
+            <div>
+              <h3>20+ Storey Tower</h3>
+              <p>Iconic skyline landmark</p>
+            </div>
+          </div>
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon" aria-hidden="true">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 16.8 7.1 18.2l.9-5.5-4-3.9L9.5 8z"/></svg>
+            </div>
+            <div>
+              <h3>15+ Amenities</h3>
+              <p>Clubhouse, gym &amp; temple</p>
+            </div>
+          </div>
+          <div class="hero-feature-card">
+            <div class="hero-feature-icon" aria-hidden="true">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div>
+              <h3>Vastu Compliant</h3>
+              <p>Peaceful private living</p>
             </div>
           </div>
         </div>
 
-        <div class="hero-media">
-          <div class="hero-slider-container" id="heroSlider" aria-label="Project Visual Showcase">
-            <div class="hero-slide active" data-index="0" data-label="Day Elevation">
-              <img src="assets/images/tower-elevation-day.jpg" alt="Codename Udaan Iconic 20+ Storey Tower - Day View" class="hero-slide-img" fetchpriority="high" />
-            </div>
-            <div class="hero-slide" data-index="1" data-label="Twilight Architecture">
-              <img src="assets/images/tower-elevation-eve.jpg" alt="Codename Udaan Architectural Landmark - Evening Illumination" class="hero-slide-img" loading="lazy" />
-            </div>
-            <div class="hero-slide" data-index="2" data-label="Master Campus View">
-              <img src="assets/images/campus-aerial-view.jpg" alt="Codename Udaan Landscaped Campus &amp; Amenities Aerial View" class="hero-slide-img" loading="lazy" />
-            </div>
-            <div class="hero-slider-overlay"></div>
-          </div>
-
-          <button type="button" class="hero-nav-btn hero-nav-prev" id="heroSidePrevBtn" aria-label="Previous slide">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        <div class="hero-cta-group">
+          <button type="button" class="btn btn-gold btn-lg" data-action="open-modal" data-title="Download Instant Brochure &amp; Price Sheet" data-sub="Get official e-brochure, floor layouts &amp; pre-launch pricing on WhatsApp." data-type="Brochure Download" data-btn="Download Brochure PDF">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>Download Instant Brochure</span>
           </button>
-          <button type="button" class="hero-nav-btn hero-nav-next" id="heroSideNextBtn" aria-label="Next slide">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          <a href="#site-visit" class="btn btn-outline-gold btn-lg">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            <span>Schedule VIP Site Visit</span>
+          </a>
+        </div>
+
+        <p class="hero-address">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span>Shahad-Mohane Road, Shahad (West), Kalyan, Maharashtra</span>
+        </p>
+      </div>
+
+      <div class="hero-cinema-bar" id="heroCinemaBar">
+        <div class="hero-slide-meta">
+          <span class="hero-slide-index"><em id="heroSlideCurrent">01</em><span>/ 03</span></span>
+          <span class="hero-slide-label" id="heroSlideLabel">Day Elevation</span>
+        </div>
+        <div class="hero-progress-track" aria-hidden="true">
+          <div class="hero-progress-fill" id="heroProgressFill"></div>
+        </div>
+        <div class="hero-thumbs" id="heroThumbs" role="tablist" aria-label="Hero slide previews">
+          <button type="button" class="hero-thumb active" data-slide="0" role="tab" aria-selected="true" aria-label="Day Elevation">
+            <img src="assets/images/tower-elevation-day.jpg" alt="" loading="lazy" />
+            <span>Day</span>
           </button>
-
-          <div class="hero-cinema-bar" id="heroCinemaBar">
-            <div class="hero-slide-meta">
-              <span class="hero-slide-index"><em id="heroSlideCurrent">01</em><span>/ 03</span></span>
-              <span class="hero-slide-label" id="heroSlideLabel">Day Elevation</span>
-            </div>
-
-            <div class="hero-progress-track" aria-hidden="true">
-              <div class="hero-progress-fill" id="heroProgressFill"></div>
-            </div>
-
-            <div class="hero-thumbs" id="heroThumbs" role="tablist" aria-label="Hero slide previews">
-              <button type="button" class="hero-thumb active" data-slide="0" role="tab" aria-selected="true" aria-label="Day Elevation">
-                <img src="assets/images/tower-elevation-day.jpg" alt="" loading="lazy" />
-                <span>Day</span>
-              </button>
-              <button type="button" class="hero-thumb" data-slide="1" role="tab" aria-selected="false" aria-label="Twilight Architecture">
-                <img src="assets/images/tower-elevation-eve.jpg" alt="" loading="lazy" />
-                <span>Twilight</span>
-              </button>
-              <button type="button" class="hero-thumb" data-slide="2" role="tab" aria-selected="false" aria-label="Master Campus View">
-                <img src="assets/images/campus-aerial-view.jpg" alt="" loading="lazy" />
-                <span>Campus</span>
-              </button>
-            </div>
-          </div>
+          <button type="button" class="hero-thumb" data-slide="1" role="tab" aria-selected="false" aria-label="Twilight Architecture">
+            <img src="assets/images/tower-elevation-eve.jpg" alt="" loading="lazy" />
+            <span>Twilight</span>
+          </button>
+          <button type="button" class="hero-thumb" data-slide="2" role="tab" aria-selected="false" aria-label="Master Campus View">
+            <img src="assets/images/campus-aerial-view.jpg" alt="" loading="lazy" />
+            <span>Campus</span>
+          </button>
         </div>
       </div>
     </section>
