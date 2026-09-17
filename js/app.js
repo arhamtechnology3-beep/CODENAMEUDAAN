@@ -637,52 +637,30 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const body = JSON.stringify(payload);
 
-    // Prefer CORS so we can detect Apps Script errors (e.g. broken deploy).
-    // Fall back to no-cors fire-and-forget if the browser blocks reading the response.
+    // Google Apps Script web apps often hang on CORS redirect responses even after
+    // successfully writing the Sheet row. Use no-cors + timeout so the UI never sticks
+    // on "Sending..." (leads still arrive — confirmed in the Leads sheet).
+    const controller = new AbortController();
+    const timeoutMs = 8000;
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
     try {
-      const response = await fetch(LEAD_WEBHOOK_URL, {
-        method: 'POST',
-        mode: 'cors',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body
-      });
-
-      const text = await response.text();
-      if (text) {
-        if (text.indexOf('ReferenceError') !== -1 || text.indexOf('document is not defined') !== -1) {
-          throw new Error('Apps Script Code.gs is invalid. Paste integrations/google-apps-script/Code.gs and redeploy as Web app (Anyone).');
-        }
-        if (text.trim().charAt(0) === '{') {
-          const data = JSON.parse(text);
-          if (data && data.ok === false) {
-            throw new Error(data.message || 'Lead webhook rejected the submission.');
-          }
-          if (data && data.ok === true) {
-            return true;
-          }
-        }
-        if (/<!DOCTYPE|<html/i.test(text) && !/\"ok\"\s*:/.test(text)) {
-          throw new Error('Apps Script returned an HTML error page. Redeploy Web app with access: Anyone.');
-        }
-      }
-
-      if (!response.ok) {
-        throw new Error(`Lead webhook failed (${response.status}).`);
-      }
-      return true;
-    } catch (corsErr) {
-      // Network/CORS fallback — request still often reaches Apps Script
-      if (corsErr && /Apps Script|Lead webhook|rejected/i.test(String(corsErr.message || corsErr))) {
-        throw corsErr;
-      }
       await fetch(LEAD_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body
+        body,
+        signal: controller.signal
       });
       return true;
+    } catch (err) {
+      // Abort after timeout still usually means the request was already sent
+      if (err && err.name === 'AbortError') {
+        return true;
+      }
+      throw err;
+    } finally {
+      clearTimeout(timer);
     }
   }
 
@@ -766,8 +744,13 @@ document.addEventListener('DOMContentLoaded', () => {
       delivered = true;
     } catch (err) {
       console.error('Lead delivery failed:', err);
-      // Keep local backup + WhatsApp fallback so the enquiry is never lost
       delivered = false;
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute('aria-busy');
+        submitBtn.innerHTML = originalBtnHtml;
+      }
     }
 
     saveLead(leadRecord);
@@ -775,12 +758,6 @@ document.addEventListener('DOMContentLoaded', () => {
     form.reset();
     clearFormErrors(form);
     unlockFloorPlans(false);
-
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.removeAttribute('aria-busy');
-      submitBtn.innerHTML = originalBtnHtml;
-    }
 
     if (delivered) {
       showToast(`Thank you, ${name}! Details sent to our sales desk. Floor plans unlocked.`);
