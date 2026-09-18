@@ -13,9 +13,13 @@
 
 var NOTIFY_EMAIL = 'udaancodname@gmail.com';
 var SHEET_NAME = 'Leads';
+// REQUIRED for standalone Apps Script projects (Untitled project):
+// From your Sheet URL: https://docs.google.com/spreadsheets/d/THIS_PART/edit
+// Paste THIS_PART below between the quotes.
+var SHEET_ID = '1M_GugvptD5pm-50VedufBGCN5F1RekaqlIFPwXHx7E';
 
 function doGet(e) {
-  return respond_({ ok: true, service: 'Codename Udaan Lead Capture' });
+  return respond_({ ok: true, service: 'Codename Udaan Lead Capture', hasSheetId: Boolean(SHEET_ID) });
 }
 
 function doPost(e) {
@@ -69,8 +73,15 @@ function normalizeLead_(data) {
 }
 
 function writeLead_(lead) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) throw new Error('Bind this script to your Google Sheet (open via Extensions → Apps Script)');
+  var ss = null;
+  if (SHEET_ID) {
+    ss = SpreadsheetApp.openById(SHEET_ID);
+  } else {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
+  if (!ss) {
+    throw new Error('Set SHEET_ID in Code.gs to your Google Sheet ID (from the Sheet URL).');
+  }
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) {
